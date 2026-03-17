@@ -121,9 +121,9 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply min-h-screen bg-background text-foreground;
+    @apply min-h-screen bg-background text-foreground leading-7;
   }
   html {
-    @apply font-sans;
+    @apply font-sans text-[17px] md:text-[18px];
   }
 }

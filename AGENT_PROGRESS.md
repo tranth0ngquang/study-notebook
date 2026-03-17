@@ -1,7 +1,7 @@
 # AGENT_PROGRESS
 
 ## Current Phase
-- Phase 10: Final polish follow-up for lecture section UX in progress
+- Phase 11: Typography and readability polish completed
 
 ## Assessment Date
 - 2026-03-17
@@ -36,9 +36,9 @@
 - Handoff documentation is now in `README.md`
 
 ## What I Will Build Next
-- Improve readability of existing lecture section items versus create forms
-- Hide remaining sort-order UI leaks in structured lecture sections
-- Re-verify locally after the UX pass
+- No new feature phase is active
+- The app is in post-polish verification and handoff state
+- Any next work should come from live-environment findings or additional user feedback
 
 ## Risks or Blockers
 - Sign-up confirmation behavior still depends on Supabase Auth dashboard settings
@@ -49,9 +49,9 @@
 - Final live verification still depends on connecting the current repo state to a real migrated Supabase project
 
 ## Immediate Build Plan
-1. Refine lecture section item cards so saved rows are visually distinct from create forms
-2. Remove remaining exposed sort-order inputs from edit UIs where they confuse users
-3. Re-run typecheck, lint, and build
+1. Typography polish is complete
+2. Local verification is complete
+3. Next work depends on deployment/runtime feedback
 
 ## Completed In This Phase
 - Bootstrapped the project foundation
@@ -90,6 +90,9 @@
   - updated README for project handoff, setup, migrations, storage, and limitations
 - Added UX messaging that timestamps are for local video review only and materials upload excludes video files
 - Updated storage docs with manual bucket fallback and file lifecycle notes
+- Improved lecture section item cards so saved rows are visually distinct from create forms
+- Removed exposed sort-order inputs from lecture section create UIs and now assign sort order server-side where appropriate
+- Increased the global typography scale and control sizing across the app shell, inputs, textareas, buttons, and tabs for better readability
 - Verified with:
   - `npm run typecheck`
   - `npm run lint`
@@ -235,3 +238,4 @@
 - End-to-end auth, course, lecture, lecture-section, materials, task, review, and search flows were not executed against the live Supabase project from the agent to avoid mutating real user data/storage automatically
 - The new tasks phase requires running `supabase/migrations/20260317193000_align_tasks_module.sql` before using task CRUD against the live database
 - The MVP now depends on final live Supabase verification rather than further local feature work
+- Typography has been increased globally, but final tuning can still be adjusted after real-device review if specific screens need even larger text

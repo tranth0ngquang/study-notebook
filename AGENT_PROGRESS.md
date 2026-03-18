@@ -1,7 +1,7 @@
 # AGENT_PROGRESS
 
 ## Current Phase
-- Phase 13: Lecture-section accordion interaction polish completed
+- Phase 14: Materials upload body-limit hardening completed
 
 ## Assessment Date
 - 2026-03-17
@@ -49,7 +49,7 @@
 - Final live verification still depends on connecting the current repo state to a real migrated Supabase project
 
 ## Immediate Build Plan
-1. Accordion interaction pass is complete
+1. Materials upload body-limit hardening is complete
 2. Local verification is complete
 3. Next work depends on fresh product feedback or deployment/runtime findings
 
@@ -95,6 +95,7 @@
 - Increased the global typography scale and control sizing across the app shell, inputs, textareas, buttons, and tabs for better readability
 - Refreshed saved lecture-section items with stronger colored card treatments so existing data is visually distinct from create forms across objectives, concepts, examples, timestamps, and questions
 - Converted saved lecture-section items into compact accordion rows with summary headers for objectives, concepts, examples, timestamps, and questions
+- Reworked lecture materials upload to send files directly from the browser to Supabase Storage so large PDFs no longer hit the Next.js Server Action 1 MB body limit
 - Verified with:
   - `npm run typecheck`
   - `npm run lint`
@@ -123,6 +124,7 @@
 - `src/lib/lecture-sections/types.ts`
 - `src/lib/materials/actions.ts`
 - `src/lib/materials/queries.ts`
+- `src/lib/materials/shared.ts`
 - `src/lib/materials/storage.ts`
 - `src/lib/materials/types.ts`
 - `src/lib/tasks/actions.ts`
@@ -243,3 +245,4 @@
 - The MVP now depends on final live Supabase verification rather than further local feature work
 - Typography has been increased globally, but final tuning can still be adjusted after real-device review if specific screens need even larger text
 - The lecture workspace now uses more vivid saved-item colors; any further tuning should focus on preferred saturation level rather than basic differentiation
+- Large material uploads now bypass the Server Action body limit, but final live verification should still confirm the Supabase bucket policies and browser upload experience in production

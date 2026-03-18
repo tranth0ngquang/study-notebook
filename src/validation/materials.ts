@@ -8,4 +8,8 @@ export const lectureMaterialSchema = z.object({
   fileSize: z.number().int().nonnegative().max(1024 * 1024 * 100).nullish(),
 });
 
+export const createLectureMaterialMetadataSchema = lectureMaterialSchema.extend({
+  storagePath: z.string().trim().min(1).max(512),
+});
+
 export type LectureMaterialInput = z.infer<typeof lectureMaterialSchema>;

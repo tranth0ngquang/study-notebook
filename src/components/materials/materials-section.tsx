@@ -1,7 +1,6 @@
 import { MaterialList } from "@/components/materials/material-list";
 import { MaterialUploadForm } from "@/components/materials/material-upload-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { uploadLectureMaterialsAction } from "@/lib/materials/actions";
 import type { LectureMaterial } from "@/types/domain";
 
 type MaterialsSectionProps = {
@@ -27,11 +26,7 @@ export function MaterialsSection({
           </p>
         </CardHeader>
         <CardContent>
-          <MaterialUploadForm
-            action={uploadLectureMaterialsAction}
-            courseId={courseId}
-            lectureId={lectureId}
-          />
+          <MaterialUploadForm courseId={courseId} lectureId={lectureId} />
         </CardContent>
       </Card>
 

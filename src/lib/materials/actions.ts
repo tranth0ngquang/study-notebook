@@ -6,28 +6,20 @@ import { redirect } from "next/navigation";
 import {
   deleteMaterialObject,
   getOwnedMaterialForDelete,
-  resolveUniqueMaterialName,
-  uploadMaterialObject,
 } from "@/lib/materials/storage";
 import {
   initialMaterialActionState,
   type MaterialActionState,
 } from "@/lib/materials/types";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { lectureMaterialSchema } from "@/validation/materials";
-
-const MAX_SIZE = 1024 * 1024 * 100;
+import { createLectureMaterialMetadataSchema } from "@/validation/materials";
 
 function revalidateMaterialPaths(courseId: string, lectureId: string) {
   revalidatePath(`/courses/${courseId}`);
   revalidatePath(`/courses/${courseId}/lectures/${lectureId}`);
 }
 
-function isAllowedMaterial(file: File) {
-  return !file.type.startsWith("video/");
-}
-
-export async function uploadLectureMaterialsAction(
+export async function createLectureMaterialMetadataAction(
   previousState: MaterialActionState = initialMaterialActionState,
   formData: FormData,
 ): Promise<MaterialActionState> {
@@ -35,12 +27,24 @@ export async function uploadLectureMaterialsAction(
 
   const courseId = String(formData.get("courseId") ?? "");
   const lectureId = String(formData.get("lectureId") ?? "");
-  const files = formData.getAll("files").filter((value): value is File => value instanceof File && value.size > 0);
+  const fileName = String(formData.get("fileName") ?? "");
+  const storagePath = String(formData.get("storagePath") ?? "");
+  const mimeType = String(formData.get("mimeType") ?? "");
+  const fileSize = Number(formData.get("fileSize") ?? 0);
 
-  if (!files.length) {
+  const parsed = createLectureMaterialMetadataSchema.safeParse({
+    courseId,
+    lectureId,
+    fileName,
+    storagePath,
+    mimeType: mimeType || null,
+    fileSize,
+  });
+
+  if (!parsed.success) {
     return {
       status: "error",
-      message: "Choose at least one file to upload.",
+      message: "Invalid file metadata.",
     };
   }
 
@@ -56,78 +60,28 @@ export async function uploadLectureMaterialsAction(
     };
   }
 
-  const renamedFiles: string[] = [];
+  const { error } = await supabase.from("lecture_materials").insert({
+    user_id: user.id,
+    course_id: parsed.data.courseId,
+    lecture_id: parsed.data.lectureId,
+    file_name: parsed.data.fileName,
+    storage_path: parsed.data.storagePath,
+    mime_type: parsed.data.mimeType,
+    file_size: parsed.data.fileSize,
+  });
 
-  for (const file of files) {
-    if (!isAllowedMaterial(file)) {
-      return {
-        status: "error",
-        message: `"${file.name}" looks like a video file. Only lecture materials are supported here.`,
-      };
-    }
-
-    if (file.size > MAX_SIZE) {
-      return {
-        status: "error",
-        message: `"${file.name}" exceeds the 100 MB limit.`,
-      };
-    }
-
-    const { fileName, storagePath, wasRenamed } = await resolveUniqueMaterialName(
-      user.id,
-      courseId,
-      lectureId,
-      file.name,
-    );
-
-    const parsed = lectureMaterialSchema.safeParse({
-      courseId,
-      lectureId,
-      fileName,
-      mimeType: file.type || null,
-      fileSize: file.size,
-    });
-
-    if (!parsed.success) {
-      return {
-        status: "error",
-        message: `Invalid file metadata for "${file.name}".`,
-      };
-    }
-
-    await uploadMaterialObject(storagePath, file);
-
-    const { error } = await supabase.from("lecture_materials").insert({
-      user_id: user.id,
-      course_id: courseId,
-      lecture_id: lectureId,
-      file_name: fileName,
-      storage_path: storagePath,
-      mime_type: file.type || null,
-      file_size: file.size,
-    });
-
-    if (error) {
-      await deleteMaterialObject(storagePath);
-      return {
-        status: "error",
-        message: error.message,
-      };
-    }
-
-    if (wasRenamed) {
-      renamedFiles.push(`${file.name} -> ${fileName}`);
-    }
+  if (error) {
+    return {
+      status: "error",
+      message: error.message,
+    };
   }
 
   revalidateMaterialPaths(courseId, lectureId);
 
   return {
     status: "success",
-    message:
-      renamedFiles.length > 0
-        ? `Upload complete. Duplicate names were renamed: ${renamedFiles.join(", ")}`
-        : `${files.length} file${files.length > 1 ? "s" : ""} uploaded.`,
+    message: "Material metadata saved.",
   };
 }
 

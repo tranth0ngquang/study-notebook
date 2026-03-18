@@ -1,23 +1,10 @@
-import path from "node:path";
-
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { LectureMaterial } from "@/types/domain";
-
-const BUCKET = "lecture-materials";
-
-function sanitizeFileName(fileName: string) {
-  return fileName
-    .replace(/[<>:"/\\|?*\u0000-\u001F]/g, "-")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function splitFileName(fileName: string) {
-  const extension = path.extname(fileName);
-  const baseName = fileName.slice(0, Math.max(1, fileName.length - extension.length));
-  return { baseName, extension };
-}
+import {
+  MATERIAL_BUCKET as BUCKET,
+  resolveUniqueMaterialNameWithClient,
+} from "@/lib/materials/shared";
 
 async function getOwnedLectureMaterial(materialId: string) {
   const supabase = await createServerSupabaseClient();
@@ -50,35 +37,25 @@ export async function resolveUniqueMaterialName(
   originalName: string,
 ) {
   const supabase = await createServerSupabaseClient();
-  const cleanName = sanitizeFileName(originalName) || "file";
-  const { baseName, extension } = splitFileName(cleanName);
+  return resolveUniqueMaterialNameWithClient({
+    findExistingStoragePath: async (storagePath) => {
+      const { data, error } = await supabase
+        .from("lecture_materials")
+        .select("id")
+        .eq("storage_path", storagePath)
+        .maybeSingle();
 
-  let candidate = cleanName;
-  let counter = 2;
+      if (error) {
+        throw new Error(error.message);
+      }
 
-  while (true) {
-    const storagePath = `${userId}/${courseId}/${lectureId}/${candidate}`;
-    const { data, error } = await supabase
-      .from("lecture_materials")
-      .select("id")
-      .eq("storage_path", storagePath)
-      .maybeSingle();
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    if (!data) {
-      return {
-        fileName: candidate,
-        storagePath,
-        wasRenamed: candidate !== cleanName,
-      };
-    }
-
-    candidate = `${baseName} (${counter})${extension}`;
-    counter += 1;
-  }
+      return Boolean(data);
+    },
+    userId,
+    courseId,
+    lectureId,
+    originalName,
+  });
 }
 
 export async function uploadMaterialObject(storagePath: string, file: File) {

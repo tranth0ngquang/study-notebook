@@ -1,7 +1,7 @@
 # AGENT_PROGRESS
 
 ## Current Phase
-- Phase 11: Typography and readability polish completed
+- Phase 12: Saved-item visual differentiation polish completed
 
 ## Assessment Date
 - 2026-03-17
@@ -36,9 +36,9 @@
 - Handoff documentation is now in `README.md`
 
 ## What I Will Build Next
-- No new feature phase is active
-- The app is in post-polish verification and handoff state
-- Any next work should come from live-environment findings or additional user feedback
+- No additional feature phase is active
+- The app is back in post-polish verification and handoff state
+- Any next work should come from deployment/runtime issues or further product feedback
 
 ## Risks or Blockers
 - Sign-up confirmation behavior still depends on Supabase Auth dashboard settings
@@ -49,9 +49,9 @@
 - Final live verification still depends on connecting the current repo state to a real migrated Supabase project
 
 ## Immediate Build Plan
-1. Typography polish is complete
+1. Saved-item visual differentiation pass is complete
 2. Local verification is complete
-3. Next work depends on deployment/runtime feedback
+3. Next work depends on fresh user feedback or runtime findings
 
 ## Completed In This Phase
 - Bootstrapped the project foundation
@@ -93,6 +93,7 @@
 - Improved lecture section item cards so saved rows are visually distinct from create forms
 - Removed exposed sort-order inputs from lecture section create UIs and now assign sort order server-side where appropriate
 - Increased the global typography scale and control sizing across the app shell, inputs, textareas, buttons, and tabs for better readability
+- Refreshed saved lecture-section items with stronger colored card treatments so existing data is visually distinct from create forms across objectives, concepts, examples, timestamps, and questions
 - Verified with:
   - `npm run typecheck`
   - `npm run lint`
@@ -239,3 +240,4 @@
 - The new tasks phase requires running `supabase/migrations/20260317193000_align_tasks_module.sql` before using task CRUD against the live database
 - The MVP now depends on final live Supabase verification rather than further local feature work
 - Typography has been increased globally, but final tuning can still be adjusted after real-device review if specific screens need even larger text
+- The lecture workspace now uses more vivid saved-item colors; any further tuning should focus on preferred saturation level rather than basic differentiation

@@ -64,11 +64,15 @@ export function ConceptSection({
 function ConceptRow({ concept, courseId, lectureId }: { concept: Concept; courseId: string; lectureId: string }) {
   const [state, action] = useActionState(updateConceptAction, initialSectionActionState);
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-      <div className="mb-4 flex items-center justify-between gap-3">
+    <div className="rounded-[1.75rem] border border-amber-200/80 bg-gradient-to-br from-amber-50 via-white to-rose-50 p-5 shadow-[0_20px_45px_-30px_rgba(251,191,36,0.75)]">
+      <div className="mb-5 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <Badge variant="secondary">Saved concept</Badge>
-          <span className="text-sm text-slate-500">#{concept.sort_order + 1}</span>
+          <Badge className="border-amber-200 bg-amber-100 text-amber-950">
+            Saved concept
+          </Badge>
+          <span className="inline-flex rounded-full border border-rose-200 bg-white/90 px-3 py-1 text-sm font-medium text-rose-700">
+            Item #{concept.sort_order + 1}
+          </span>
         </div>
         <form action={deleteConceptAction}>
           <input name="courseId" type="hidden" value={courseId} />
@@ -78,42 +82,46 @@ function ConceptRow({ concept, courseId, lectureId }: { concept: Concept; course
         </form>
       </div>
 
-      <form action={action} className="grid gap-3 md:grid-cols-2">
+      <form action={action} className="space-y-4">
           <input name="courseId" type="hidden" value={courseId} />
           <input name="lectureId" type="hidden" value={lectureId} />
           <input name="itemId" type="hidden" value={concept.id} />
           <input name="sortOrder" type="hidden" value={concept.sort_order} />
-          <div className="space-y-2">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">
-              Title
-            </p>
-            <Input defaultValue={concept.title ?? ""} name="title" placeholder="Concept title" />
+          <div className="rounded-2xl border border-white/80 bg-white/85 p-4 backdrop-blur-sm">
+            <div className="grid gap-3 md:grid-cols-2">
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-amber-700">
+                  Title
+                </p>
+                <Input defaultValue={concept.title ?? ""} name="title" placeholder="Concept title" />
+              </div>
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-amber-700">
+                  Formula
+                </p>
+                <Input defaultValue={concept.formula ?? ""} name="formula" placeholder="Formula or notation" />
+              </div>
+              <div className="space-y-2 md:col-span-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-rose-700">
+                  Definition
+                </p>
+                <Textarea className="md:col-span-2" defaultValue={concept.definition ?? ""} name="definition" rows={3} />
+              </div>
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-amber-700">
+                  Example
+                </p>
+                <Input defaultValue={concept.example ?? ""} name="example" placeholder="Quick example" />
+              </div>
+              <div className="space-y-2 md:col-span-1">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-rose-700">
+                  Usage note
+                </p>
+                <Textarea className="md:col-span-2" defaultValue={concept.usage_note ?? ""} name="usageNote" rows={3} />
+              </div>
+            </div>
           </div>
-          <div className="space-y-2">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">
-              Formula
-            </p>
-            <Input defaultValue={concept.formula ?? ""} name="formula" placeholder="Formula or notation" />
-          </div>
-          <div className="space-y-2 md:col-span-2">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">
-              Definition
-            </p>
-            <Textarea className="md:col-span-2" defaultValue={concept.definition ?? ""} name="definition" rows={3} />
-          </div>
-          <div className="space-y-2">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">
-              Example
-            </p>
-            <Input defaultValue={concept.example ?? ""} name="example" placeholder="Quick example" />
-          </div>
-          <div className="space-y-2 md:col-span-1">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">
-              Usage note
-            </p>
-            <Textarea className="md:col-span-2" defaultValue={concept.usage_note ?? ""} name="usageNote" rows={3} />
-          </div>
-          <div className="md:col-span-2 flex justify-end">
+          <div className="flex justify-end">
             <SectionSubmitButton idleLabel="Save changes" pendingLabel="Saving..." />
           </div>
       </form>

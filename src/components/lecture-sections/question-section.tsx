@@ -50,11 +50,19 @@ export function QuestionSection({ courseId, lectureId, questions }: { courseId: 
 function QuestionRow({ courseId, lectureId, question }: { courseId: string; lectureId: string; question: Question }) {
   const [state, action] = useActionState(updateQuestionAction, initialSectionActionState);
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-      <div className="mb-4 flex items-center justify-between gap-3">
+    <div className="rounded-[1.75rem] border border-rose-200/80 bg-gradient-to-br from-rose-50 via-white to-pink-50 p-5 shadow-[0_20px_45px_-30px_rgba(244,63,94,0.45)]">
+      <div className="mb-5 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <Badge variant="secondary">Saved question</Badge>
-          <Badge variant={question.is_resolved ? "secondary" : "outline"}>
+          <Badge className="border-rose-200 bg-rose-100 text-rose-900">
+            Saved question
+          </Badge>
+          <Badge
+            className={
+              question.is_resolved
+                ? "border-emerald-200 bg-emerald-100 text-emerald-900"
+                : "border-orange-200 bg-orange-100 text-orange-900"
+            }
+          >
             {question.is_resolved ? "Resolved" : "Unresolved"}
           </Badge>
         </div>
@@ -66,27 +74,31 @@ function QuestionRow({ courseId, lectureId, question }: { courseId: string; lect
         </form>
       </div>
 
-      <form action={action} className="grid gap-3 md:grid-cols-[1fr_220px_auto]">
+      <form action={action} className="space-y-4">
           <input name="courseId" type="hidden" value={courseId} />
           <input name="lectureId" type="hidden" value={lectureId} />
           <input name="itemId" type="hidden" value={question.id} />
           <input name="sortOrder" type="hidden" value={question.sort_order} />
-          <div className="space-y-2 md:col-span-3">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">
-              Question
-            </p>
-            <Textarea defaultValue={question.content} name="content" rows={3} />
+          <div className="rounded-2xl border border-white/80 bg-white/85 p-4 backdrop-blur-sm">
+            <div className="grid gap-3 md:grid-cols-[1fr_220px]">
+              <div className="space-y-2 md:col-span-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-rose-700">
+                  Question
+                </p>
+                <Textarea defaultValue={question.content} name="content" rows={3} />
+              </div>
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-pink-700">
+                  Status
+                </p>
+                <select className="h-10 w-full rounded-xl border border-input bg-white px-3 text-[0.98rem] outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50" defaultValue={question.is_resolved ? "resolved" : "unresolved"} name="status">
+                  <option value="unresolved">Unresolved</option>
+                  <option value="resolved">Resolved</option>
+                </select>
+              </div>
+            </div>
           </div>
-          <div className="space-y-2">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">
-              Status
-            </p>
-            <select className="h-10 w-full rounded-xl border border-input bg-white px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50" defaultValue={question.is_resolved ? "resolved" : "unresolved"} name="status">
-              <option value="unresolved">Unresolved</option>
-              <option value="resolved">Resolved</option>
-            </select>
-          </div>
-          <div className="flex items-end justify-end">
+          <div className="flex justify-end">
             <SectionSubmitButton idleLabel="Save changes" pendingLabel="Saving..." />
           </div>
       </form>

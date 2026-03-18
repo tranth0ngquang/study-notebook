@@ -47,11 +47,15 @@ export function ExampleSection({ courseId, lectureId, examples }: { courseId: st
 function ExampleRow({ courseId, lectureId, example }: { courseId: string; lectureId: string; example: Example }) {
   const [state, action] = useActionState(updateExampleAction, initialSectionActionState);
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-      <div className="mb-4 flex items-center justify-between gap-3">
+    <div className="rounded-[1.75rem] border border-violet-200/80 bg-gradient-to-br from-violet-50 via-white to-fuchsia-50 p-5 shadow-[0_20px_45px_-30px_rgba(139,92,246,0.6)]">
+      <div className="mb-5 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <Badge variant="secondary">Saved example</Badge>
-          <span className="text-sm text-slate-500">#{example.sort_order + 1}</span>
+          <Badge className="border-violet-200 bg-violet-100 text-violet-900">
+            Saved example
+          </Badge>
+          <span className="inline-flex rounded-full border border-fuchsia-200 bg-white/90 px-3 py-1 text-sm font-medium text-fuchsia-700">
+            Item #{example.sort_order + 1}
+          </span>
         </div>
         <form action={deleteExampleAction}>
           <input name="courseId" type="hidden" value={courseId} />
@@ -61,25 +65,29 @@ function ExampleRow({ courseId, lectureId, example }: { courseId: string; lectur
         </form>
       </div>
 
-      <form action={action} className="grid gap-3 md:grid-cols-2">
+      <form action={action} className="space-y-4">
           <input name="courseId" type="hidden" value={courseId} />
           <input name="lectureId" type="hidden" value={lectureId} />
           <input name="itemId" type="hidden" value={example.id} />
           <input name="sortOrder" type="hidden" value={example.sort_order} />
-          <div className="space-y-2">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">
-              Title
-            </p>
-            <Input defaultValue={example.title ?? ""} name="title" placeholder="Example title" />
+          <div className="rounded-2xl border border-white/80 bg-white/85 p-4 backdrop-blur-sm">
+            <div className="grid gap-3 md:grid-cols-2">
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-violet-700">
+                  Title
+                </p>
+                <Input defaultValue={example.title ?? ""} name="title" placeholder="Example title" />
+              </div>
+              <div className="hidden md:block" />
+              <div className="space-y-2 md:col-span-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-fuchsia-700">
+                  Description
+                </p>
+                <Textarea className="md:col-span-2" defaultValue={example.description ?? ""} name="description" rows={4} />
+              </div>
+            </div>
           </div>
-          <div className="hidden md:block" />
-          <div className="space-y-2 md:col-span-2">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">
-              Description
-            </p>
-            <Textarea className="md:col-span-2" defaultValue={example.description ?? ""} name="description" rows={4} />
-          </div>
-          <div className="md:col-span-2 flex justify-end">
+          <div className="flex justify-end">
             <SectionSubmitButton idleLabel="Save changes" pendingLabel="Saving..." />
           </div>
       </form>

@@ -89,11 +89,15 @@ function ObjectiveRow({
   );
 
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-      <div className="mb-4 flex items-center justify-between gap-3">
+    <div className="rounded-[1.75rem] border border-sky-200/80 bg-gradient-to-br from-sky-50 via-white to-cyan-50 p-5 shadow-[0_20px_45px_-30px_rgba(14,165,233,0.6)]">
+      <div className="mb-5 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <Badge variant="secondary">Saved objective</Badge>
-          <span className="text-sm text-slate-500">#{objective.sort_order + 1}</span>
+          <Badge className="border-sky-200 bg-sky-100 text-sky-900">
+            Saved objective
+          </Badge>
+          <span className="inline-flex rounded-full border border-sky-200 bg-white/90 px-3 py-1 text-sm font-medium text-sky-700">
+            Item #{objective.sort_order + 1}
+          </span>
         </div>
         <form action={deleteObjectiveAction}>
           <input name="courseId" type="hidden" value={courseId} />
@@ -103,16 +107,18 @@ function ObjectiveRow({
         </form>
       </div>
 
-      <form action={action} className="space-y-3">
-        <div className="space-y-2">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">
-            Objective
-          </p>
-          <input name="courseId" type="hidden" value={courseId} />
-          <input name="lectureId" type="hidden" value={lectureId} />
-          <input name="itemId" type="hidden" value={objective.id} />
-          <input name="sortOrder" type="hidden" value={objective.sort_order} />
-          <Input defaultValue={objective.content} name="content" />
+      <form action={action} className="space-y-4">
+        <input name="courseId" type="hidden" value={courseId} />
+        <input name="lectureId" type="hidden" value={lectureId} />
+        <input name="itemId" type="hidden" value={objective.id} />
+        <input name="sortOrder" type="hidden" value={objective.sort_order} />
+        <div className="rounded-2xl border border-white/80 bg-white/85 p-4 backdrop-blur-sm">
+          <div className="space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-700">
+              Saved objective content
+            </p>
+            <Input defaultValue={objective.content} name="content" />
+          </div>
         </div>
         <div className="flex justify-end">
           <SectionSubmitButton idleLabel="Save changes" pendingLabel="Saving..." />

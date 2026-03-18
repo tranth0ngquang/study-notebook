@@ -67,11 +67,13 @@ export function TimestampSection({ courseId, lectureId, timestamps }: { courseId
 function TimestampRow({ courseId, lectureId, timestamp }: { courseId: string; lectureId: string; timestamp: Timestamp }) {
   const [state, action] = useActionState(updateTimestampAction, initialSectionActionState);
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-      <div className="mb-4 flex items-center justify-between gap-3">
+    <div className="rounded-[1.75rem] border border-cyan-200/80 bg-gradient-to-br from-cyan-50 via-white to-blue-50 p-5 shadow-[0_20px_45px_-30px_rgba(6,182,212,0.65)]">
+      <div className="mb-5 flex items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="secondary">Saved timestamp</Badge>
-          <div className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700">
+          <Badge className="border-cyan-200 bg-cyan-100 text-cyan-950">
+            Saved timestamp
+          </Badge>
+          <div className="inline-flex rounded-full border border-blue-200 bg-white/90 px-3 py-1 text-sm font-semibold text-blue-700">
             {formatSeconds(timestamp.time_seconds)}
           </div>
         </div>
@@ -82,36 +84,40 @@ function TimestampRow({ courseId, lectureId, timestamp }: { courseId: string; le
           <SectionDeleteButton confirmMessage="Delete this timestamp?" />
         </form>
       </div>
-      <form action={action} className="grid gap-3 md:grid-cols-2">
+      <form action={action} className="space-y-4">
           <input name="courseId" type="hidden" value={courseId} />
           <input name="lectureId" type="hidden" value={lectureId} />
           <input name="itemId" type="hidden" value={timestamp.id} />
           <input name="sortOrder" type="hidden" value={timestamp.sort_order} />
-          <div className="space-y-2">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">
-              Time label
-            </p>
-            <Input defaultValue={timestamp.time_label ?? ""} name="timeLabel" placeholder="01:32" />
+          <div className="rounded-2xl border border-white/80 bg-white/85 p-4 backdrop-blur-sm">
+            <div className="grid gap-3 md:grid-cols-2">
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-700">
+                  Time label
+                </p>
+                <Input defaultValue={timestamp.time_label ?? ""} name="timeLabel" placeholder="01:32" />
+              </div>
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-blue-700">
+                  Seconds
+                </p>
+                <Input defaultValue={timestamp.time_seconds} min={0} name="timeSeconds" type="number" />
+              </div>
+              <div className="space-y-2 md:col-span-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-700">
+                  Title
+                </p>
+                <Input className="md:col-span-2" defaultValue={timestamp.title ?? ""} name="title" placeholder="Title" />
+              </div>
+              <div className="space-y-2 md:col-span-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-blue-700">
+                  Note
+                </p>
+                <Textarea className="md:col-span-2" defaultValue={timestamp.note ?? ""} name="note" rows={3} />
+              </div>
+            </div>
           </div>
-          <div className="space-y-2">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">
-              Seconds
-            </p>
-            <Input defaultValue={timestamp.time_seconds} min={0} name="timeSeconds" type="number" />
-          </div>
-          <div className="space-y-2 md:col-span-2">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">
-              Title
-            </p>
-            <Input className="md:col-span-2" defaultValue={timestamp.title ?? ""} name="title" placeholder="Title" />
-          </div>
-          <div className="space-y-2 md:col-span-2">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">
-              Note
-            </p>
-            <Textarea className="md:col-span-2" defaultValue={timestamp.note ?? ""} name="note" rows={3} />
-          </div>
-          <div className="md:col-span-2 flex justify-end">
+          <div className="flex justify-end">
             <SectionSubmitButton idleLabel="Save changes" pendingLabel="Saving..." />
           </div>
       </form>

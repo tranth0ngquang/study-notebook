@@ -14,6 +14,12 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 import { SectionDeleteButton } from "./section-delete-button";
 import { SectionSubmitButton } from "./section-submit-button";
@@ -38,7 +44,7 @@ export function ExampleSection({ courseId, lectureId, examples }: { courseId: st
           </div>
           {createState.message ? <p className={`mt-3 text-sm ${createState.status === "error" ? "text-destructive" : "text-teal-700"}`}>{createState.message}</p> : null}
         </form>
-        {examples.length > 0 ? examples.map((example) => <ExampleRow key={example.id} courseId={courseId} lectureId={lectureId} example={example} />) : <p className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-600">No examples yet.</p>}
+        {examples.length > 0 ? <Accordion multiple>{examples.map((example) => <ExampleRow key={example.id} courseId={courseId} lectureId={lectureId} example={example} />)}</Accordion> : <p className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-600">No examples yet.</p>}
       </CardContent>
     </Card>
   );
@@ -47,15 +53,29 @@ export function ExampleSection({ courseId, lectureId, examples }: { courseId: st
 function ExampleRow({ courseId, lectureId, example }: { courseId: string; lectureId: string; example: Example }) {
   const [state, action] = useActionState(updateExampleAction, initialSectionActionState);
   return (
-    <div className="rounded-[1.75rem] border border-violet-200/80 bg-gradient-to-br from-violet-50 via-white to-fuchsia-50 p-5 shadow-[0_20px_45px_-30px_rgba(139,92,246,0.6)]">
-      <div className="mb-5 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <Badge className="border-violet-200 bg-violet-100 text-violet-900">
-            Saved example
-          </Badge>
-          <span className="inline-flex rounded-full border border-fuchsia-200 bg-white/90 px-3 py-1 text-sm font-medium text-fuchsia-700">
-            Item #{example.sort_order + 1}
-          </span>
+    <AccordionItem className="rounded-[1.75rem] border border-violet-200/80 bg-gradient-to-br from-violet-50 via-white to-fuchsia-50 shadow-[0_20px_45px_-30px_rgba(139,92,246,0.6)]" value={example.id}>
+      <div className="flex items-start gap-3 p-5">
+        <div className="min-w-0 flex-1">
+          <AccordionTrigger className="bg-white/35">
+            <div className="space-y-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge className="border-violet-200 bg-violet-100 text-violet-900">
+                  Saved example
+                </Badge>
+                <span className="inline-flex rounded-full border border-fuchsia-200 bg-white/90 px-3 py-1 text-sm font-medium text-fuchsia-700">
+                  Item #{example.sort_order + 1}
+                </span>
+              </div>
+              <div className="space-y-1">
+                <p className="line-clamp-1 text-lg font-semibold text-slate-900">
+                  {example.title || "Untitled example"}
+                </p>
+                <p className="line-clamp-2 text-sm text-slate-600">
+                  {example.description || "Expand to review the worked example details."}
+                </p>
+              </div>
+            </div>
+          </AccordionTrigger>
         </div>
         <form action={deleteExampleAction}>
           <input name="courseId" type="hidden" value={courseId} />
@@ -65,7 +85,8 @@ function ExampleRow({ courseId, lectureId, example }: { courseId: string; lectur
         </form>
       </div>
 
-      <form action={action} className="space-y-4">
+      <AccordionContent>
+        <form action={action} className="space-y-4">
           <input name="courseId" type="hidden" value={courseId} />
           <input name="lectureId" type="hidden" value={lectureId} />
           <input name="itemId" type="hidden" value={example.id} />
@@ -90,8 +111,9 @@ function ExampleRow({ courseId, lectureId, example }: { courseId: string; lectur
           <div className="flex justify-end">
             <SectionSubmitButton idleLabel="Save changes" pendingLabel="Saving..." />
           </div>
-      </form>
+        </form>
+      </AccordionContent>
       {state.message ? <p className={`mt-3 text-sm ${state.status === "error" ? "text-destructive" : "text-teal-700"}`}>{state.message}</p> : null}
-    </div>
+    </AccordionItem>
   );
 }

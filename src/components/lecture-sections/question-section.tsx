@@ -13,6 +13,12 @@ import type { Database } from "@/types/database";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 import { SectionDeleteButton } from "./section-delete-button";
 import { SectionSubmitButton } from "./section-submit-button";
@@ -31,7 +37,7 @@ export function QuestionSection({ courseId, lectureId, questions }: { courseId: 
           <input name="sortOrder" type="hidden" value="0" />
           <div className="grid gap-3 md:grid-cols-[1fr_180px]">
             <Textarea className="md:col-span-2" name="content" placeholder="What remains unclear or worth revisiting?" rows={3} />
-            <select className="h-10 rounded-xl border border-input bg-white px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50" defaultValue="unresolved" name="status">
+            <select className="h-10 rounded-xl border border-input bg-white px-3 text-[0.98rem] outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50" defaultValue="unresolved" name="status">
               <option value="unresolved">Unresolved</option>
               <option value="resolved">Resolved</option>
             </select>
@@ -41,7 +47,7 @@ export function QuestionSection({ courseId, lectureId, questions }: { courseId: 
           </div>
           {createState.message ? <p className={`mt-3 text-sm ${createState.status === "error" ? "text-destructive" : "text-teal-700"}`}>{createState.message}</p> : null}
         </form>
-        {questions.length > 0 ? questions.map((question) => <QuestionRow key={question.id} courseId={courseId} lectureId={lectureId} question={question} />) : <p className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-600">No questions yet.</p>}
+        {questions.length > 0 ? <Accordion multiple>{questions.map((question) => <QuestionRow key={question.id} courseId={courseId} lectureId={lectureId} question={question} />)}</Accordion> : <p className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-600">No questions yet.</p>}
       </CardContent>
     </Card>
   );
@@ -50,21 +56,35 @@ export function QuestionSection({ courseId, lectureId, questions }: { courseId: 
 function QuestionRow({ courseId, lectureId, question }: { courseId: string; lectureId: string; question: Question }) {
   const [state, action] = useActionState(updateQuestionAction, initialSectionActionState);
   return (
-    <div className="rounded-[1.75rem] border border-rose-200/80 bg-gradient-to-br from-rose-50 via-white to-pink-50 p-5 shadow-[0_20px_45px_-30px_rgba(244,63,94,0.45)]">
-      <div className="mb-5 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <Badge className="border-rose-200 bg-rose-100 text-rose-900">
-            Saved question
-          </Badge>
-          <Badge
-            className={
-              question.is_resolved
-                ? "border-emerald-200 bg-emerald-100 text-emerald-900"
-                : "border-orange-200 bg-orange-100 text-orange-900"
-            }
-          >
-            {question.is_resolved ? "Resolved" : "Unresolved"}
-          </Badge>
+    <AccordionItem className="rounded-[1.75rem] border border-rose-200/80 bg-gradient-to-br from-rose-50 via-white to-pink-50 shadow-[0_20px_45px_-30px_rgba(244,63,94,0.45)]" value={question.id}>
+      <div className="flex items-start gap-3 p-5">
+        <div className="min-w-0 flex-1">
+          <AccordionTrigger className="bg-white/35">
+            <div className="space-y-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge className="border-rose-200 bg-rose-100 text-rose-900">
+                  Saved question
+                </Badge>
+                <Badge
+                  className={
+                    question.is_resolved
+                      ? "border-emerald-200 bg-emerald-100 text-emerald-900"
+                      : "border-orange-200 bg-orange-100 text-orange-900"
+                  }
+                >
+                  {question.is_resolved ? "Resolved" : "Unresolved"}
+                </Badge>
+              </div>
+              <div className="space-y-1">
+                <p className="line-clamp-2 text-base font-medium text-slate-900">
+                  {question.content}
+                </p>
+                <p className="text-sm text-slate-600">
+                  Expand to review or update the question details.
+                </p>
+              </div>
+            </div>
+          </AccordionTrigger>
         </div>
         <form action={deleteQuestionAction}>
           <input name="courseId" type="hidden" value={courseId} />
@@ -74,7 +94,8 @@ function QuestionRow({ courseId, lectureId, question }: { courseId: string; lect
         </form>
       </div>
 
-      <form action={action} className="space-y-4">
+      <AccordionContent>
+        <form action={action} className="space-y-4">
           <input name="courseId" type="hidden" value={courseId} />
           <input name="lectureId" type="hidden" value={lectureId} />
           <input name="itemId" type="hidden" value={question.id} />
@@ -101,8 +122,9 @@ function QuestionRow({ courseId, lectureId, question }: { courseId: string; lect
           <div className="flex justify-end">
             <SectionSubmitButton idleLabel="Save changes" pendingLabel="Saving..." />
           </div>
-      </form>
+        </form>
+      </AccordionContent>
       {state.message ? <p className={`mt-3 text-sm ${state.status === "error" ? "text-destructive" : "text-teal-700"}`}>{state.message}</p> : null}
-    </div>
+    </AccordionItem>
   );
 }

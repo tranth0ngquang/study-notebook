@@ -1,7 +1,7 @@
 # AGENT_PROGRESS
 
 ## Current Phase
-- Phase 12: Saved-item visual differentiation polish completed
+- Phase 13: Lecture-section accordion interaction polish completed
 
 ## Assessment Date
 - 2026-03-17
@@ -36,9 +36,9 @@
 - Handoff documentation is now in `README.md`
 
 ## What I Will Build Next
-- No additional feature phase is active
+- No new feature phase is active
 - The app is back in post-polish verification and handoff state
-- Any next work should come from deployment/runtime issues or further product feedback
+- Any next work should come from runtime issues or further UX feedback
 
 ## Risks or Blockers
 - Sign-up confirmation behavior still depends on Supabase Auth dashboard settings
@@ -49,9 +49,9 @@
 - Final live verification still depends on connecting the current repo state to a real migrated Supabase project
 
 ## Immediate Build Plan
-1. Saved-item visual differentiation pass is complete
+1. Accordion interaction pass is complete
 2. Local verification is complete
-3. Next work depends on fresh user feedback or runtime findings
+3. Next work depends on fresh product feedback or deployment/runtime findings
 
 ## Completed In This Phase
 - Bootstrapped the project foundation
@@ -94,6 +94,7 @@
 - Removed exposed sort-order inputs from lecture section create UIs and now assign sort order server-side where appropriate
 - Increased the global typography scale and control sizing across the app shell, inputs, textareas, buttons, and tabs for better readability
 - Refreshed saved lecture-section items with stronger colored card treatments so existing data is visually distinct from create forms across objectives, concepts, examples, timestamps, and questions
+- Converted saved lecture-section items into compact accordion rows with summary headers for objectives, concepts, examples, timestamps, and questions
 - Verified with:
   - `npm run typecheck`
   - `npm run lint`
@@ -173,6 +174,7 @@
 - `src/components/tasks/*`
 - `src/components/layout/*`
 - `src/components/ui/*`
+- `src/components/ui/accordion.tsx`
 - `README.md`
 - `supabase/AUTH_SETUP.md`
 - `supabase/STORAGE_SETUP.md`

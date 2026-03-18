@@ -14,6 +14,12 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 import { SectionDeleteButton } from "./section-delete-button";
 import { SectionSubmitButton } from "./section-submit-button";
@@ -58,7 +64,7 @@ export function TimestampSection({ courseId, lectureId, timestamps }: { courseId
           </div>
           {createState.message ? <p className={`mt-3 text-sm ${createState.status === "error" ? "text-destructive" : "text-teal-700"}`}>{createState.message}</p> : null}
         </form>
-        {timestamps.length > 0 ? timestamps.map((timestamp) => <TimestampRow key={timestamp.id} courseId={courseId} lectureId={lectureId} timestamp={timestamp} />) : <p className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-600">No timestamps yet.</p>}
+        {timestamps.length > 0 ? <Accordion multiple>{timestamps.map((timestamp) => <TimestampRow key={timestamp.id} courseId={courseId} lectureId={lectureId} timestamp={timestamp} />)}</Accordion> : <p className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-600">No timestamps yet.</p>}
       </CardContent>
     </Card>
   );
@@ -67,15 +73,29 @@ export function TimestampSection({ courseId, lectureId, timestamps }: { courseId
 function TimestampRow({ courseId, lectureId, timestamp }: { courseId: string; lectureId: string; timestamp: Timestamp }) {
   const [state, action] = useActionState(updateTimestampAction, initialSectionActionState);
   return (
-    <div className="rounded-[1.75rem] border border-cyan-200/80 bg-gradient-to-br from-cyan-50 via-white to-blue-50 p-5 shadow-[0_20px_45px_-30px_rgba(6,182,212,0.65)]">
-      <div className="mb-5 flex items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-2">
-          <Badge className="border-cyan-200 bg-cyan-100 text-cyan-950">
-            Saved timestamp
-          </Badge>
-          <div className="inline-flex rounded-full border border-blue-200 bg-white/90 px-3 py-1 text-sm font-semibold text-blue-700">
-            {formatSeconds(timestamp.time_seconds)}
-          </div>
+    <AccordionItem className="rounded-[1.75rem] border border-cyan-200/80 bg-gradient-to-br from-cyan-50 via-white to-blue-50 shadow-[0_20px_45px_-30px_rgba(6,182,212,0.65)]" value={timestamp.id}>
+      <div className="flex items-start gap-3 p-5">
+        <div className="min-w-0 flex-1">
+          <AccordionTrigger className="bg-white/35">
+            <div className="space-y-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge className="border-cyan-200 bg-cyan-100 text-cyan-950">
+                  Saved timestamp
+                </Badge>
+                <div className="inline-flex rounded-full border border-blue-200 bg-white/90 px-3 py-1 text-sm font-semibold text-blue-700">
+                  {formatSeconds(timestamp.time_seconds)}
+                </div>
+              </div>
+              <div className="space-y-1">
+                <p className="line-clamp-1 text-lg font-semibold text-slate-900">
+                  {timestamp.title || timestamp.time_label || "Timestamp marker"}
+                </p>
+                <p className="line-clamp-2 text-sm text-slate-600">
+                  {timestamp.note || `Review point at ${formatSeconds(timestamp.time_seconds)}.`}
+                </p>
+              </div>
+            </div>
+          </AccordionTrigger>
         </div>
         <form action={deleteTimestampAction}>
           <input name="courseId" type="hidden" value={courseId} />
@@ -84,7 +104,8 @@ function TimestampRow({ courseId, lectureId, timestamp }: { courseId: string; le
           <SectionDeleteButton confirmMessage="Delete this timestamp?" />
         </form>
       </div>
-      <form action={action} className="space-y-4">
+      <AccordionContent>
+        <form action={action} className="space-y-4">
           <input name="courseId" type="hidden" value={courseId} />
           <input name="lectureId" type="hidden" value={lectureId} />
           <input name="itemId" type="hidden" value={timestamp.id} />
@@ -120,8 +141,9 @@ function TimestampRow({ courseId, lectureId, timestamp }: { courseId: string; le
           <div className="flex justify-end">
             <SectionSubmitButton idleLabel="Save changes" pendingLabel="Saving..." />
           </div>
-      </form>
+        </form>
+      </AccordionContent>
       {state.message ? <p className={`mt-3 text-sm ${state.status === "error" ? "text-destructive" : "text-teal-700"}`}>{state.message}</p> : null}
-    </div>
+    </AccordionItem>
   );
 }

@@ -14,6 +14,12 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 import { SectionDeleteButton } from "./section-delete-button";
 import { SectionSubmitButton } from "./section-submit-button";
@@ -55,7 +61,7 @@ export function ConceptSection({
           </div>
           {createState.message ? <p className={`mt-3 text-sm ${createState.status === "error" ? "text-destructive" : "text-teal-700"}`}>{createState.message}</p> : null}
         </form>
-        {concepts.length > 0 ? concepts.map((concept) => <ConceptRow key={concept.id} concept={concept} courseId={courseId} lectureId={lectureId} />) : <p className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-600">No concepts yet.</p>}
+        {concepts.length > 0 ? <Accordion multiple>{concepts.map((concept) => <ConceptRow key={concept.id} concept={concept} courseId={courseId} lectureId={lectureId} />)}</Accordion> : <p className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-600">No concepts yet.</p>}
       </CardContent>
     </Card>
   );
@@ -64,15 +70,29 @@ export function ConceptSection({
 function ConceptRow({ concept, courseId, lectureId }: { concept: Concept; courseId: string; lectureId: string }) {
   const [state, action] = useActionState(updateConceptAction, initialSectionActionState);
   return (
-    <div className="rounded-[1.75rem] border border-amber-200/80 bg-gradient-to-br from-amber-50 via-white to-rose-50 p-5 shadow-[0_20px_45px_-30px_rgba(251,191,36,0.75)]">
-      <div className="mb-5 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <Badge className="border-amber-200 bg-amber-100 text-amber-950">
-            Saved concept
-          </Badge>
-          <span className="inline-flex rounded-full border border-rose-200 bg-white/90 px-3 py-1 text-sm font-medium text-rose-700">
-            Item #{concept.sort_order + 1}
-          </span>
+    <AccordionItem className="rounded-[1.75rem] border border-amber-200/80 bg-gradient-to-br from-amber-50 via-white to-rose-50 shadow-[0_20px_45px_-30px_rgba(251,191,36,0.75)]" value={concept.id}>
+      <div className="flex items-start gap-3 p-5">
+        <div className="min-w-0 flex-1">
+          <AccordionTrigger className="bg-white/35">
+            <div className="space-y-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge className="border-amber-200 bg-amber-100 text-amber-950">
+                  Saved concept
+                </Badge>
+                <span className="inline-flex rounded-full border border-rose-200 bg-white/90 px-3 py-1 text-sm font-medium text-rose-700">
+                  Item #{concept.sort_order + 1}
+                </span>
+              </div>
+              <div className="space-y-1">
+                <p className="line-clamp-1 text-lg font-semibold text-slate-900">
+                  {concept.title || "Untitled concept"}
+                </p>
+                <p className="line-clamp-2 text-sm text-slate-600">
+                  {concept.definition || concept.usage_note || "Expand to review definition, formula, example, and usage notes."}
+                </p>
+              </div>
+            </div>
+          </AccordionTrigger>
         </div>
         <form action={deleteConceptAction}>
           <input name="courseId" type="hidden" value={courseId} />
@@ -82,7 +102,8 @@ function ConceptRow({ concept, courseId, lectureId }: { concept: Concept; course
         </form>
       </div>
 
-      <form action={action} className="space-y-4">
+      <AccordionContent>
+        <form action={action} className="space-y-4">
           <input name="courseId" type="hidden" value={courseId} />
           <input name="lectureId" type="hidden" value={lectureId} />
           <input name="itemId" type="hidden" value={concept.id} />
@@ -124,8 +145,9 @@ function ConceptRow({ concept, courseId, lectureId }: { concept: Concept; course
           <div className="flex justify-end">
             <SectionSubmitButton idleLabel="Save changes" pendingLabel="Saving..." />
           </div>
-      </form>
+        </form>
+      </AccordionContent>
       {state.message ? <p className={`mt-3 text-sm ${state.status === "error" ? "text-destructive" : "text-teal-700"}`}>{state.message}</p> : null}
-    </div>
+    </AccordionItem>
   );
 }

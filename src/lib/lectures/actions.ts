@@ -8,7 +8,15 @@ import {
   type LectureFormState,
 } from "@/lib/lectures/types";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { lectureSchema } from "@/validation/lectures";
+import {
+  lectureCompletionSchema,
+  lectureSchema,
+} from "@/validation/lectures";
+
+export type LectureCompletionActionState = {
+  status: "success" | "error";
+  message?: string;
+};
 
 function normalizeLecturePayload(formData: FormData) {
   const nullable = (key: string) => {
@@ -34,6 +42,9 @@ function normalizeLecturePayload(formData: FormData) {
 
 function revalidateLecturePaths(courseId: string, lectureId?: string) {
   revalidatePath("/dashboard");
+  revalidatePath("/lectures");
+  revalidatePath("/review");
+  revalidatePath("/courses");
   revalidatePath(`/courses/${courseId}`);
   revalidatePath(`/courses/${courseId}/lectures`);
   if (lectureId) {
@@ -198,4 +209,53 @@ export async function deleteLectureAction(formData: FormData) {
 
   revalidateLecturePaths(courseId, lectureId);
   redirect(redirectTo);
+}
+
+export async function toggleLectureCompletionAction(formData: FormData) {
+  const parsed = lectureCompletionSchema.safeParse({
+    courseId: String(formData.get("courseId") ?? ""),
+    lectureId: String(formData.get("lectureId") ?? ""),
+    completed: String(formData.get("completed") ?? "false"),
+  });
+
+  if (!parsed.success) {
+    return {
+      status: "error",
+      message: "Lecture completion payload is invalid.",
+    } satisfies LectureCompletionActionState;
+  }
+
+  const supabase = await createServerSupabaseClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const isCompleted = parsed.data.completed === "true";
+
+  const { error } = await supabase
+    .from("lectures")
+    .update({
+      is_completed: isCompleted,
+      completed_at: isCompleted ? new Date().toISOString() : null,
+    })
+    .eq("id", parsed.data.lectureId)
+    .eq("course_id", parsed.data.courseId)
+    .eq("user_id", user.id);
+
+  if (error) {
+    return {
+      status: "error",
+      message: error.message,
+    } satisfies LectureCompletionActionState;
+  }
+
+  revalidateLecturePaths(parsed.data.courseId, parsed.data.lectureId);
+
+  return {
+    status: "success",
+  } satisfies LectureCompletionActionState;
 }

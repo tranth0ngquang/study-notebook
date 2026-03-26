@@ -6,7 +6,7 @@ type Concept = Database["public"]["Tables"]["lecture_concepts"]["Row"];
 type Question = Database["public"]["Tables"]["lecture_questions"]["Row"];
 
 export type SearchMatch = {
-  field: "title" | "topic" | "summary" | "concept" | "question";
+  field: "overview" | "title" | "topic" | "summary" | "concept" | "question";
   label: string;
   snippet: string;
 };
@@ -101,10 +101,30 @@ export async function searchCourseContent(
   const course = (courseResult.data as Course | null) ?? null;
   const lectures = (lecturesResult.data ?? []) as Lecture[];
 
-  if (!course || query.length === 0) {
+  if (!course) {
     return {
       course,
       results: [],
+      query: rawQuery,
+    };
+  }
+
+  if (query.length === 0) {
+    return {
+      course,
+      results: lectures.map((lecture) => ({
+        lecture,
+        matches: [
+          {
+            field: "overview",
+            label: "Lecture overview",
+            snippet:
+              lecture.summary?.trim() ||
+              lecture.topic?.trim() ||
+              "Open this lecture to review its notes, timestamps, tasks, materials, and questions.",
+          },
+        ],
+      })),
       query: rawQuery,
     };
   }

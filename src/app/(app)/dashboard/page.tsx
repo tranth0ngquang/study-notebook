@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { ArrowRight, BookOpenText, Clock3, ListTodo, PlaySquare } from "lucide-react";
 
+import { getLectureCompletionBadgeStyle, getLectureCompletionCardStyle } from "@/lib/lectures/completion-style";
 import { EmptyCoursesState } from "@/components/courses/empty-courses-state";
 import { TaskStatusBadge } from "@/components/tasks/task-status-badge";
 import { Badge } from "@/components/ui/badge";
@@ -127,10 +128,22 @@ export default async function DashboardPage() {
                 recentLectures.map((lecture) => (
                   <Link
                     key={lecture.id}
-                    className="block rounded-2xl border border-slate-200 p-4 transition-colors hover:bg-slate-50"
+                    className={`block rounded-2xl border p-4 transition-colors ${
+                      lecture.is_completed
+                        ? ""
+                        : "border-slate-200 hover:bg-slate-50"
+                    }`}
+                    style={lecture.is_completed ? getLectureCompletionCardStyle(lecture.course?.color) : undefined}
                     href={`/courses/${lecture.course_id}/lectures/${lecture.id}`}
                   >
-                    <p className="font-medium text-slate-950">{lecture.title}</p>
+                    <div className="flex items-start justify-between gap-3">
+                      <p className="font-medium text-slate-950">{lecture.title}</p>
+                      {lecture.is_completed ? (
+                        <Badge style={getLectureCompletionBadgeStyle(lecture.course?.color)}>
+                          Done
+                        </Badge>
+                      ) : null}
+                    </div>
                     <p className="mt-1 text-sm text-slate-500">
                       {lecture.summary?.trim() || "No summary yet."}
                     </p>

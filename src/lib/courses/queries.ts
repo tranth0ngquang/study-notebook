@@ -3,7 +3,9 @@ import type { Course, Lecture, Task } from "@/types/domain";
 
 type DashboardData = {
   recentCourses: Course[];
-  recentLectures: Lecture[];
+  recentLectures: (Lecture & {
+    course: Pick<Course, "id" | "title" | "color"> | null;
+  })[];
   upcomingTasks: Task[];
 };
 
@@ -68,13 +70,17 @@ export async function getDashboardData(): Promise<DashboardData> {
     };
   }
 
-  const [coursesResult, lecturesResult, tasksResult] = await Promise.all([
+  const [coursesResult, lectureCoursesResult, lecturesResult, tasksResult] = await Promise.all([
     supabase
       .from("courses")
       .select("*")
       .eq("user_id", user.id)
       .order("updated_at", { ascending: false })
       .limit(4),
+    supabase
+      .from("courses")
+      .select("id, title, color")
+      .eq("user_id", user.id),
     supabase
       .from("lectures")
       .select("*")
@@ -102,9 +108,27 @@ export async function getDashboardData(): Promise<DashboardData> {
     throw new Error(tasksResult.error.message);
   }
 
+  if (lectureCoursesResult.error) {
+    throw new Error(lectureCoursesResult.error.message);
+  }
+
+  const courseMap = new Map(
+    (lectureCoursesResult.data ?? []).map((course) => [
+      course.id,
+      {
+        id: course.id,
+        title: course.title,
+        color: course.color,
+      },
+    ]),
+  );
+
   return {
     recentCourses: coursesResult.data as Course[],
-    recentLectures: lecturesResult.data as Lecture[],
+    recentLectures: ((lecturesResult.data ?? []) as Lecture[]).map((lecture) => ({
+      ...lecture,
+      course: courseMap.get(lecture.course_id) ?? null,
+    })),
     upcomingTasks: tasksResult.data as Task[],
   };
 }

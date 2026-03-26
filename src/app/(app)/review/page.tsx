@@ -7,6 +7,10 @@ import { AlertTriangle, ArrowRight, BrainCircuit, CircleHelp, ListTodo } from "l
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getCourses } from "@/lib/courses/queries";
+import {
+  getLectureCompletionBadgeStyle,
+  getLectureCompletionCardStyle,
+} from "@/lib/lectures/completion-style";
 import { getCourseReviewData } from "@/lib/review/queries";
 
 type ReviewPageProps = {
@@ -161,7 +165,19 @@ export default async function ReviewPage({ searchParams }: ReviewPageProps) {
           {reviewData.lectures.length > 0 ? (
             <div className="space-y-4">
               {reviewData.lectures.map((lecture) => (
-                <Card key={lecture.id} className="border-slate-200 bg-white shadow-sm">
+                <Card
+                  key={lecture.id}
+                  className={
+                    lecture.is_completed
+                      ? "shadow-sm"
+                      : "border-slate-200 bg-white shadow-sm"
+                  }
+                  style={
+                    lecture.is_completed
+                      ? getLectureCompletionCardStyle(reviewData.course?.color)
+                      : undefined
+                  }
+                >
                   <CardHeader className="space-y-3">
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div className="space-y-2">
@@ -174,6 +190,15 @@ export default async function ReviewPage({ searchParams }: ReviewPageProps) {
                           {lecture.lecture_date ? (
                             <Badge variant="outline">
                               {new Date(lecture.lecture_date).toLocaleDateString()}
+                            </Badge>
+                          ) : null}
+                          {lecture.is_completed ? (
+                            <Badge
+                              style={getLectureCompletionBadgeStyle(
+                                reviewData.course?.color,
+                              )}
+                            >
+                              Completed
                             </Badge>
                           ) : null}
                         </div>

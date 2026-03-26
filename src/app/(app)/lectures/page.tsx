@@ -2,6 +2,11 @@ import Link from "next/link";
 
 import { CalendarDays, Clock3, PlaySquare, UserRound } from "lucide-react";
 
+import { LectureCompletionToggle } from "@/components/lectures/lecture-completion-toggle";
+import {
+  getLectureCompletionBadgeStyle,
+  getLectureCompletionCardStyle,
+} from "@/lib/lectures/completion-style";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getAllLecturesWithCourse } from "@/lib/lectures/overview";
@@ -31,7 +36,15 @@ export default async function LecturesPage() {
       {lectures.length > 0 ? (
         <div className="space-y-4">
           {lectures.map((lecture) => (
-            <Card key={lecture.id} className="border-slate-200 bg-white shadow-sm">
+            <Card
+              key={lecture.id}
+              className={
+                lecture.is_completed
+                  ? "shadow-sm"
+                  : "border-slate-200 bg-white shadow-sm"
+              }
+              style={lecture.is_completed ? getLectureCompletionCardStyle(lecture.course?.color) : undefined}
+            >
               <CardHeader className="space-y-3">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="space-y-2">
@@ -42,6 +55,11 @@ export default async function LecturesPage() {
                       {lecture.lecture_number ? (
                         <Badge variant="secondary">
                           Lecture {lecture.lecture_number}
+                        </Badge>
+                      ) : null}
+                      {lecture.is_completed ? (
+                        <Badge style={getLectureCompletionBadgeStyle(lecture.course?.color)}>
+                          Completed
                         </Badge>
                       ) : null}
                     </div>
@@ -80,6 +98,14 @@ export default async function LecturesPage() {
                 <p className="text-sm leading-6 text-slate-600">
                   {lecture.summary?.trim() || "No summary yet."}
                 </p>
+                <div className="pt-1">
+                  <LectureCompletionToggle
+                    checked={lecture.is_completed}
+                    courseId={lecture.course_id}
+                    courseColor={lecture.course?.color}
+                    lectureId={lecture.id}
+                  />
+                </div>
               </CardContent>
             </Card>
           ))}

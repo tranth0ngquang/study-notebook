@@ -8,14 +8,20 @@ import { QuestionSection } from "@/components/lecture-sections/question-section"
 import { TimestampSection } from "@/components/lecture-sections/timestamp-section";
 import { MaterialsSection } from "@/components/materials/materials-section";
 import { TaskSection } from "@/components/tasks/task-section";
+import { LectureCompletionToggle } from "@/components/lectures/lecture-completion-toggle";
 import { DeleteLectureButton } from "@/components/lectures/delete-lecture-button";
 import { LectureForm } from "@/components/lectures/lecture-form";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  getLectureCompletionBadgeStyle,
+  getLectureCompletionCardStyle,
+} from "@/lib/lectures/completion-style";
 import { getLectureSections } from "@/lib/lecture-sections/queries";
 import { deleteLectureAction, updateLectureAction } from "@/lib/lectures/actions";
 import { getLectureById } from "@/lib/lectures/queries";
+import { getCourseById } from "@/lib/courses/queries";
 import { getLectureMaterials } from "@/lib/materials/queries";
 import { getLectureTasks } from "@/lib/tasks/queries";
 
@@ -28,6 +34,7 @@ export default async function LectureWorkspacePage({
 }: LectureWorkspacePageProps) {
   const { courseId, lectureId } = await params;
   const lecture = await getLectureById(courseId, lectureId);
+  const course = await getCourseById(courseId);
   const sections = await getLectureSections(lectureId);
   const materials = await getLectureMaterials(lectureId);
   const tasks = await getLectureTasks(lectureId);
@@ -38,27 +45,51 @@ export default async function LectureWorkspacePage({
 
   return (
     <div className="space-y-6">
-      <Card className="border-slate-200 bg-white shadow-sm">
+      <Card
+        className={
+          lecture.is_completed
+            ? "shadow-sm"
+            : "border-slate-200 bg-white shadow-sm"
+        }
+        style={lecture.is_completed ? getLectureCompletionCardStyle(course?.color) : undefined}
+      >
         <CardHeader className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="space-y-2">
-              <Badge variant="secondary" className="w-fit">
-                Lecture workspace
-              </Badge>
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge variant="secondary" className="w-fit">
+                  Lecture workspace
+                </Badge>
+                {lecture.is_completed ? (
+                  <Badge style={getLectureCompletionBadgeStyle(course?.color)}>
+                    Completed
+                  </Badge>
+                ) : null}
+              </div>
               <CardTitle className="text-3xl tracking-tight">
                 {lecture.title}
               </CardTitle>
             </div>
-            <Link
-              className="inline-flex h-10 items-center justify-center rounded-lg border border-slate-200 px-4 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-slate-950"
-              href={`/courses/${courseId}`}
-            >
-              Back to course
-            </Link>
+            <div className="flex flex-wrap items-center gap-3">
+              <LectureCompletionToggle
+                checked={lecture.is_completed}
+                courseId={courseId}
+                courseColor={course?.color}
+                lectureId={lecture.id}
+                variant="header"
+              />
+              <Link
+                className="inline-flex h-10 items-center justify-center rounded-lg border border-slate-200 px-4 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-slate-950"
+                href={`/courses/${courseId}`}
+              >
+                Back to course
+              </Link>
+            </div>
           </div>
           <p className="max-w-3xl text-sm leading-6 text-slate-600">
             This lecture shell is ready for later submodules. In this phase you
-            can manage the lecture overview, summary, and understanding score.
+            can manage the lecture overview, summary, understanding score, and
+            completion state.
           </p>
         </CardHeader>
       </Card>

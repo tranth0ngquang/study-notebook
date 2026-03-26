@@ -73,6 +73,12 @@ export const lectureSchema = z.object({
   ),
 });
 
+export const lectureCompletionSchema = z.object({
+  courseId: z.uuid(),
+  lectureId: z.uuid(),
+  completed: z.union([z.literal("true"), z.literal("false")]),
+});
+
 export const lectureListItemSchema = z.object({
   content: z.string().trim().min(1).max(2000),
   sortOrder: z.coerce.number().int().min(0).default(0),

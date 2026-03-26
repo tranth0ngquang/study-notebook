@@ -19,6 +19,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const courses = await getCourses();
   const courseId = params.courseId ?? "";
   const query = params.q ?? "";
+  const normalizedQuery = query.trim();
   const searchData = courseId ? await searchCourseContent(courseId, query) : null;
 
   return (
@@ -80,10 +81,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         <div className="rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-8 text-sm text-slate-600">
           Select a course before searching.
         </div>
-      ) : !query.trim() ? (
-        <div className="rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-8 text-sm text-slate-600">
-          Enter a search term to scan lecture notes and questions inside the selected course.
-        </div>
       ) : !searchData?.course ? (
         <div className="rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-8 text-sm text-slate-600">
           The selected course could not be found.
@@ -95,10 +92,13 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               <div className="space-y-1">
                 <CardTitle>{searchData.course.title}</CardTitle>
                 <p className="text-sm text-slate-600">
-                  {searchData.results.length} lecture
-                  {searchData.results.length === 1 ? "" : "s"} matched
-                  {" "}
-                  &quot;{query.trim()}&quot;.
+                  {normalizedQuery
+                    ? `${searchData.results.length} lecture${
+                        searchData.results.length === 1 ? "" : "s"
+                      } matched "${normalizedQuery}".`
+                    : `${searchData.results.length} lecture${
+                        searchData.results.length === 1 ? "" : "s"
+                      } in this course.`}
                 </p>
               </div>
               <SearchIcon className="size-5 text-teal-700" />
@@ -151,7 +151,9 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             </div>
           ) : (
             <div className="rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-8 text-sm text-slate-600">
-              No lecture content matched &quot;{query.trim()}&quot; in this course.
+              {normalizedQuery
+                ? `No lecture content matched "${normalizedQuery}" in this course.`
+                : "This course does not have any lectures yet."}
             </div>
           )}
         </>

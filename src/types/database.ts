@@ -225,10 +225,12 @@ export type Database = {
       };
       lectures: {
         Row: {
+          completed_at: string | null;
           course_id: string;
           created_at: string;
           duration_minutes: number | null;
           id: string;
+          is_completed: boolean;
           lecture_date: string | null;
           lecture_number: number | null;
           lecturer: string | null;
@@ -245,10 +247,12 @@ export type Database = {
           video_path: string | null;
         };
         Insert: {
+          completed_at?: string | null;
           course_id: string;
           created_at?: string;
           duration_minutes?: number | null;
           id?: string;
+          is_completed?: boolean;
           lecture_date?: string | null;
           lecture_number?: number | null;
           lecturer?: string | null;

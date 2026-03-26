@@ -4,17 +4,30 @@ import { ArrowRight, CalendarDays, Clock3, UserRound } from "lucide-react";
 
 import type { Lecture } from "@/types/domain";
 
+import { LectureCompletionToggle } from "@/components/lectures/lecture-completion-toggle";
+import {
+  getLectureCompletionBadgeStyle,
+  getLectureCompletionCardStyle,
+} from "@/lib/lectures/completion-style";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 type LectureCardProps = {
   courseId: string;
+  courseColor?: string | null;
   lecture: Lecture;
 };
 
-export function LectureCard({ courseId, lecture }: LectureCardProps) {
+export function LectureCard({ courseColor, courseId, lecture }: LectureCardProps) {
   return (
-    <Card className="border-slate-200 bg-white shadow-sm">
+    <Card
+      className={
+        lecture.is_completed
+          ? "shadow-sm"
+          : "border-slate-200 bg-white shadow-sm"
+      }
+      style={lecture.is_completed ? getLectureCompletionCardStyle(courseColor) : undefined}
+    >
       <CardHeader className="space-y-3">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-2">
@@ -23,8 +36,15 @@ export function LectureCard({ courseId, lecture }: LectureCardProps) {
                 <Badge variant="secondary">Lecture {lecture.lecture_number}</Badge>
               ) : null}
               {lecture.topic ? <Badge variant="outline">{lecture.topic}</Badge> : null}
+              {lecture.is_completed ? (
+                <Badge style={getLectureCompletionBadgeStyle(courseColor)}>
+                  Completed
+                </Badge>
+              ) : null}
             </div>
-            <CardTitle className="text-xl">{lecture.title}</CardTitle>
+            <CardTitle className="text-xl">
+              {lecture.title}
+            </CardTitle>
           </div>
           {lecture.understanding_score ? (
             <Badge variant="secondary">
@@ -59,9 +79,17 @@ export function LectureCard({ courseId, lecture }: LectureCardProps) {
         </p>
       </CardContent>
       <CardFooter className="justify-between gap-3">
-        <span className="text-sm text-slate-500">
-          {lecture.local_video_label?.trim() || "No local video label"}
-        </span>
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="text-sm text-slate-500">
+            {lecture.local_video_label?.trim() || "No local video label"}
+          </span>
+          <LectureCompletionToggle
+            checked={lecture.is_completed}
+            courseId={courseId}
+            courseColor={courseColor}
+            lectureId={lecture.id}
+          />
+        </div>
         <Link
           className="inline-flex items-center gap-2 text-sm font-medium text-teal-700 transition-colors hover:text-teal-800"
           href={`/courses/${courseId}/lectures/${lecture.id}`}

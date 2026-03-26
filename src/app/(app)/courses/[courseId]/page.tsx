@@ -76,6 +76,7 @@ export default async function CourseDetailPage({
                 lectures.map((lecture) => (
                   <LectureCard
                     key={lecture.id}
+                    courseColor={course.color}
                     courseId={course.id}
                     lecture={lecture}
                   />

@@ -1,7 +1,7 @@
 # AGENT_PROGRESS
 
 ## Current Phase
-- Phase 14: Materials upload body-limit hardening completed
+- Phase 17: Course-first search UX polish completed
 
 ## Assessment Date
 - 2026-03-17
@@ -38,7 +38,7 @@
 ## What I Will Build Next
 - No new feature phase is active
 - The app is back in post-polish verification and handoff state
-- Any next work should come from runtime issues or further UX feedback
+- Any next work should come from runtime issues or additional UX feedback
 
 ## Risks or Blockers
 - Sign-up confirmation behavior still depends on Supabase Auth dashboard settings
@@ -49,9 +49,9 @@
 - Final live verification still depends on connecting the current repo state to a real migrated Supabase project
 
 ## Immediate Build Plan
-1. Materials upload body-limit hardening is complete
+1. Course-first search UX polish is complete
 2. Local verification is complete
-3. Next work depends on fresh product feedback or deployment/runtime findings
+3. Next work depends on fresh runtime findings or product feedback
 
 ## Completed In This Phase
 - Bootstrapped the project foundation
@@ -96,8 +96,12 @@
 - Refreshed saved lecture-section items with stronger colored card treatments so existing data is visually distinct from create forms across objectives, concepts, examples, timestamps, and questions
 - Converted saved lecture-section items into compact accordion rows with summary headers for objectives, concepts, examples, timestamps, and questions
 - Reworked lecture materials upload to send files directly from the browser to Supabase Storage so large PDFs no longer hit the Next.js Server Action 1 MB body limit
+- Added lecture completion tracking with a persistent done state, quick checkbox toggle, and completed-card styling across lecture list views
+- Fixed lecture completion persistence by handling Supabase update errors explicitly and reverting the optimistic checkbox state on failure
+- Synced completed lecture styling to use the owning course color across course detail, lecture detail, dashboard, lectures overview, and review
+- Updated course search so selecting a course without a keyword still returns the course's lecture list in browse mode
 - Verified with:
-  - `npm run typecheck`
+  - `cmd /c npm run typecheck`
   - `npm run lint`
   - `npm run build`
 
@@ -117,8 +121,10 @@
 - `src/lib/courses/queries.ts`
 - `src/lib/courses/types.ts`
 - `src/lib/lectures/actions.ts`
+- `src/lib/lectures/completion-style.ts`
 - `src/lib/lectures/queries.ts`
 - `src/lib/lectures/types.ts`
+- `src/components/lectures/lecture-completion-toggle.tsx`
 - `src/lib/lecture-sections/actions.ts`
 - `src/lib/lecture-sections/queries.ts`
 - `src/lib/lecture-sections/types.ts`
@@ -184,6 +190,7 @@
 - `supabase/migrations/20260317172000_expand_lectures_core.sql`
 - `supabase/migrations/20260317181500_expand_lecture_sections.sql`
 - `supabase/migrations/20260317193000_align_tasks_module.sql`
+- `supabase/migrations/20260326093000_add_lecture_completion.sql`
 
 ## Database Changes
 - Base schema migration with:
@@ -217,6 +224,10 @@
   - `task_status`: `in_progress` -> `doing`
   - `tasks.due_at` -> `tasks.due_date`
   - `tasks_due_date_idx` on `due_date`
+- Lecture completion migration for:
+  - `lectures.is_completed`
+  - `lectures.completed_at`
+  - `lectures_is_completed_idx`
 
 ## Storage Notes
 - Bucket: `lecture-materials`
@@ -246,3 +257,4 @@
 - Typography has been increased globally, but final tuning can still be adjusted after real-device review if specific screens need even larger text
 - The lecture workspace now uses more vivid saved-item colors; any further tuning should focus on preferred saturation level rather than basic differentiation
 - Large material uploads now bypass the Server Action body limit, but final live verification should still confirm the Supabase bucket policies and browser upload experience in production
+- Lecture completion styling depends on applying `supabase/migrations/20260326093000_add_lecture_completion.sql` before using the done toggle against the live database

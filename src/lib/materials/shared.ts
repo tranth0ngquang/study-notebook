@@ -3,9 +3,18 @@ const MATERIAL_BUCKET = "lecture-materials";
 
 function sanitizeFileName(fileName: string) {
   return fileName
+    // Remove accents and decompose Unicode characters to ASCII equivalents
+    .normalize("NFD")
+    .replace(/[\u0300-\u036F]/g, "")
+    // Replace forbidden characters with hyphen
     .replace(/[<>:"/\\|?*\u0000-\u001F]/g, "-")
+    // Normalize whitespace
     .replace(/\s+/g, " ")
-    .trim();
+    // Remove any remaining non-ASCII characters
+    .replace(/[^\x20-\x7E]/g, "-")
+    .trim()
+    // Clean up multiple consecutive hyphens
+    .replace(/-+/g, "-");
 }
 
 function splitFileName(fileName: string) {
